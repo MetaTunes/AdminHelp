@@ -147,8 +147,9 @@ class AdminHelpTab extends WireData implements Module, ConfigurableModule {
 			foreach($docs as $doc) {
 				$body .= "<div id='doc{$doc->id}' class='help-doc'>";
 				$body .= "<h1><i class='fa fa-file-text-o'></i> {$doc->title}";
-				$body .= " &nbsp;<span><a href='{$docLink}{$doc->id}' target='_blank' title='Edit'><i class='fa fa-pencil'></i></a></span></h1>";
-				$body .= $doc->body;
+                $body .= " &nbsp;<span><a href='{$docLink}{$doc->id}' target='_blank' title='Edit'><i class='fa fa-pencil'></i></a></span>";
+                $body .= " &nbsp;<span><a class='popout-help' href='{$doc->url}' title='Pop-out'><i class='fa fa-external-link'></i></a></span></h1>";
+                $body .= $doc->getFormatted('body');
 				// Uncomment below to enable edit link:
 				//$body .= '<div class="doc-edit">';
 				//$body .= "<a href='{$docLink}{$doc->id}' target='_blank'><i class='fa fa-pencil'></i> Edit: {$doc->title}</a></div>";
@@ -158,8 +159,9 @@ class AdminHelpTab extends WireData implements Module, ConfigurableModule {
 					foreach($doc->children as $childDoc) {
 						$body .= "<div id='doc{$childDoc->id}' class='help-doc'>";
 						$body .= "<h1><i class='fa fa-file-text-o'></i> {$childDoc->title}";
-						$body .= " &nbsp;<span><a href='{$docLink}{$childDoc->id}' target='_blank' title='Edit'><i class='fa fa-pencil'></i></a></span></h1>";
-						$body .= $childDoc->body;
+                        $body .= " &nbsp;<span><a href='{$docLink}{$childDoc->id}' target='_blank' title='Edit'><i class='fa fa-pencil'></i></a></span>";
+                        $body .= " &nbsp;<span><a class='popout-help' href='{$childDoc->url}' title='Pop-out'><i class='fa fa-external-link'></i></a></span></h1>";
+                        $body .= $childDoc->getFormatted('body');
 						// Uncomment below to enable edit link:
 						//$body .= '<div class="doc-edit">';
 						//$body .= "<a href='{$docLink}{$childDoc->id}' target='_blank'><i class='fa fa-pencil'></i> Edit: {$childDoc->title}</a></div>";

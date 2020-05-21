@@ -59,9 +59,9 @@ class ProcessAdminHelp extends Process {
 	public function ___execute() {
 
 		$mainClass = 'AdminHelp';
-		$user = wire('user');
+        $this->user = wire('user');
 		$config = wire('config');
-		$editButtonLabel = $this->_('Edit');
+        $this->editButtonLabel = $this->_('Edit');
 		$addNewDoc = $this->_('Add New Doc');
 
 		$data = wire('modules')->getModuleConfigData($mainClass);
@@ -88,35 +88,16 @@ class ProcessAdminHelp extends Process {
 					<div class='help-doc".$cls."'>
 					{$doc->body}";
 
-			if($user->hasRole('superuser')) {
+            if($this->user->hasRole('superuser')) {
 				$out .=
 					"<div class='doc-edit'>
-						<a href='{$config->urls->admin}page/edit/?id={$doc->id}'><i class='fa fa-pencil'></i> {$editButtonLabel}: {$doc->title}</a>
+						<a href='{$config->urls->admin}page/edit/?id={$doc->id}'><i class='fa fa-pencil'></i> {$this->editButtonLabel}: {$doc->title}</a>
 					</div>";
 			}
 
 			// Children
-			if($doc->children->count()) {
-				$out .= "<ul class='cbp-ntsubaccordion'>";
-
-				foreach($doc->children as $child) {
-					$out .= "<li>
-								<h4 class='cbp-nttrigger'>{$child->title}</h4>
-								<div class='cbp-ntcontent'>
-									{$child->body}";
-
-					if($user->hasRole('superuser')) {
-						$out .=
-						"<div class='doc-edit'>
-							<a href='{$config->urls->admin}page/edit/?id={$child->id}'><i class='fa fa-pencil'></i> {$editButtonLabel}: {$child->title}</a>
-						</div>";
-					}
-
-					$out .= "</div></li>";
-				}
-
-				$out .= "</ul>";
-			}
+            $level = 4;
+            if($doc->children->count()) $out .= $this->explodeChildren($config, $doc, $level);
 
 			$out .= "</div></li>";
 		}
@@ -124,7 +105,7 @@ class ProcessAdminHelp extends Process {
 		$out .= '</ul>';
 
 		// New Doc button
-		if($user->hasRole('superuser')) {
+        if($this->user->hasRole('superuser')) {
 			$out .= "<div style='float:right;font-size:13px;'>
 				<a href='{$config->urls->admin}page/add/?parent_id={$docsRootID}'>
 					<button class='ui-button ui-widget ui-corner-all head_button_clone ui-state-default' name='button' value='Add New' type='button'>
@@ -140,6 +121,32 @@ class ProcessAdminHelp extends Process {
 
 	}
 
+    protected function explodeChildren($config, $doc, $level) {
+        $out = '';
+        $out .= "<ul class='cbp-ntsubaccordion'>";
+
+        foreach($doc->children as $child) {
+            $out .= "<li>
+								<h{$level} class='cbp-nttrigger'>{$child->title}</h{$level}>
+								<div class='cbp-ntcontent'>
+									{$child->body}";
+
+            if($this->user->hasRole('superuser')) {
+                $out .=
+                    "<div class='doc-edit'>
+							<a href='{$config->urls->admin}page/edit/?id={$child->id}'><i class='fa fa-pencil'></i> {$this->editButtonLabel}: {$child->title}</a>
+						</div>";
+            }
+            $level += 1;
+            if($child->children->count()) $out .= $this->explodeChildren($config, $child, $level);
+            $level -= 1;
+            $out .= "</div></li>";
+
+        }
+
+        $out .= "</ul>";
+        return $out;
+    }
 
 	/**
 	 * Called only when your module is installed
